@@ -1,52 +1,50 @@
-
-
 services:
   # -----------------------------------------------------------------
   # Serviço da API C# (Back-end)
   # -----------------------------------------------------------------
   api:
-    # Usa o Dockerfile da pasta ./backend para construir a imagem
     build:
+      # Usando a sua pasta BackEnd
       context: ./BackEnd
       dockerfile: Dockerfile
     
-    # Mapeia a porta interna 8000 para a porta 8000 na sua máquina (host)
     ports:
       - "8000:8000"
       
-    # Define as variáveis de ambiente necessárias para a aplicação .NET
     environment:
-      # Garante que a aplicação .NET escute em http://0.0.0.0:8000 dentro do container
       - ASPNETCORE_URLS=http://+:8000
-      
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=Development 
     
-    # Reinicia o container se ele falhar
     restart: always
 
   # -----------------------------------------------------------------
-  # Serviço do Next.js (Front-end)
+  # Serviço do Next.js (Front-end) - Configurado para Desenvolvimento
   # -----------------------------------------------------------------
   frontend:
-    # Usa o Dockerfile da pasta ./frontend para construir a imagem
+    # 1. Caminho de Build
     build:
+      # Onde o Docker encontra o Dockerfile e o código-fonte
       context: ./FrontEnd/blog-front-end
       dockerfile: Dockerfile
       
-    # Mapeia a porta interna 3000 para a porta 3000 na sua máquina (host)
     ports:
       - "3000:3000"
       
-    # Depende do serviço 'api' para começar a rodar
+    # 2. Caminho do Volume (ESSENCIAL PARA HOT-RELOAD)
+    volumes:
+      # CORRIGIDO: Este caminho deve ser EXATAMENTE a pasta que contém o package.json
+      - ./FrontEnd/blog-front-end:/app
+      # Volume anônimo para node_modules (boa prática)
+      - /app/node_modules
+      
+    # Sobrescreve o CMD para rodar no modo de desenvolvimento
+    command: npm run dev
+      
     depends_on:
       - api
       
-    # Configuração de Ambiente Crucial:
-    # O Next.js precisará usar o nome 'api' para se comunicar com o back-end, 
-    # pois 'api' é o nome do serviço na rede Docker.
     environment:
-      # Exemplo de URL de API (ajuste conforme o seu código Next.js)
-      # Dentro do container, o front-end acessa a API usando o nome do serviço 'api'
-      - NEXT_PUBLIC_API_URL=http://api:8000 
+      - NEXT_PUBLIC_API_URL=http://api:8000
       
     restart: always
+

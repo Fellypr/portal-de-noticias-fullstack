@@ -35,3 +35,12 @@
             }
         }
 }
+.currency-quote{
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 40px 5px 40px;
+    border-bottom: 1px solid #ccc;
+    align-items: center;
+    background-color: rgb(247, 244, 244);
+    color: rgb(58, 57, 57);
+}
